@@ -293,7 +293,7 @@ dialog::backdrop{background:rgba(16,24,32,.45)}
 
   function buildOutput(){
     var items=validItems(), L=[], half=Math.ceil(items.length/2);
-    L.push('<div class="fk-faq" itemscope itemtype="https://schema.org/FAQPage">');
+    L.push('<div class="fk-faq is-ready" itemscope itemtype="https://schema.org/FAQPage">');
     if(state.title.trim()||state.desc.trim()){
       L.push('<div class="fk-faq__head">');
       if(state.title.trim()) L.push('<h2>'+esc(state.title.trim())+'</h2>');
