@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SSS HTML Oluşturucu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --blue:#5887DA;--blue-d:#3E6CC0;--tint:#EEF1FA;--tint2:#F6F7FC;--line:#E7EBF9;
+  --ink:#101820;--gray:#898A8D;--gray2:#B1B1B1;--warn:#C9661F;--warn-bg:#FDF1E8;--ok:#3F8F5A;
+  --bg:#F6F7FC;--panel:#FFFFFF;--code-bg:#101820;--code-ink:#E7EBF9;
+  --font:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --tint:#1E2740;--tint2:#171D2E;--line:#2A3350;--ink:#EEF1FA;--gray:#9CA3B4;--gray2:#6B7285;
+    --warn:#F0A36B;--warn-bg:#3A2716;--bg:#0F1320;--panel:#161B2B;--code-bg:#0A0D16;
+  }
+}
+:root[data-theme="dark"]{
+  --tint:#1E2740;--tint2:#171D2E;--line:#2A3350;--ink:#EEF1FA;--gray:#9CA3B4;--gray2:#6B7285;
+  --warn:#F0A36B;--warn-bg:#3A2716;--bg:#0F1320;--panel:#161B2B;--code-bg:#0A0D16;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 28px;border-bottom:1px solid var(--line);background:var(--panel)}
+.top h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.top p{margin:2px 0 0;color:var(--gray);font-size:13.5px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 14px;font-weight:600;font-size:14px;transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--blue);background:var(--tint2)}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-d);border-color:var(--blue-d)}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--gray)}
+.btn-ghost:hover{color:var(--ink);background:var(--tint2);border-color:transparent}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;padding:28px;max-width:1680px;margin:0 auto}
+.form{display:flex;flex-direction:column;gap:20px;min-width:0}
+.block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.block h2{margin:0 0 14px;font-size:15px;font-weight:700}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{font-size:13px;font-weight:600;color:var(--gray)}
+.field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel);transition:border-color .15s}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,135,218,.15)}
+.field textarea{resize:vertical;min-height:84px;line-height:1.55}
+.hint{font-size:12.5px;color:var(--gray);margin:0}
+.hint code{font-family:var(--mono);font-size:12px;background:var(--tint);padding:1px 5px;border-radius:4px}
+
+.qs-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+.qs-head h2{margin:0}
+.count{font-size:13px;color:var(--gray)}
+.qlist{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.q{border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 16px;background:var(--tint2);position:relative}
+.q-top{display:flex;align-items:flex-start;gap:10px}
+.q-num{flex:0 0 28px;height:28px;border-radius:50%;background:var(--tint);color:var(--blue);display:grid;place-items:center;font-weight:700;font-size:13px;margin-top:6px}
+.q-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.q-fields input{font-weight:600}
+.q-fields input,.q-fields textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:var(--panel)}
+.q-fields input:focus,.q-fields textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(88,135,218,.15)}
+.q-fields textarea{resize:vertical;min-height:72px;line-height:1.55}
+.q-tools{display:flex;flex-direction:column;gap:2px}
+.icon-btn{width:30px;height:30px;border:0;background:transparent;border-radius:8px;color:var(--gray);display:grid;place-items:center}
+.icon-btn:hover{background:var(--tint);color:var(--ink)}
+.icon-btn:disabled{opacity:.3;cursor:default;background:transparent}
+.icon-btn.del:hover{color:#C43D3D}
+.icon-btn svg{width:16px;height:16px}
+.warns{list-style:none;margin:8px 0 0 38px;padding:0;display:flex;flex-direction:column;gap:4px}
+.warns li{font-size:12.5px;color:var(--warn);background:var(--warn-bg);padding:5px 9px;border-radius:7px}
+.add{width:100%;margin-top:12px;border:1.5px dashed var(--line);background:transparent;border-radius:12px;padding:12px;font-weight:600;color:var(--blue)}
+.add:hover{border-color:var(--blue);background:var(--tint2)}
+
+.out{position:sticky;top:20px;align-self:start;display:flex;flex-direction:column;gap:14px;min-width:0}
+.out-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--tint);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-weight:600;font-size:13.5px;color:var(--gray)}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,32,.08)}
+.fmt{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray)}
+
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pane[hidden]{display:none}
+.pane-scroll{max-height:calc(100vh - 170px);overflow:auto}
+.code-wrap{position:relative}
+.code{margin:0;padding:18px 20px;background:var(--code-bg);color:var(--code-ink);font-family:var(--mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:calc(100vh - 230px);overflow:auto}
+.code-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.status{font-size:13px;color:var(--gray)}
+.status b{color:var(--ink)}
+.copied{color:var(--ok);font-weight:600}
+
+/* ---- Önizleme: sitedeki CSS ile aynı ---- */
+.pv{padding:8px 4px 24px;background:#fff;color:#101820}
+.fk-faq{--fk-blue:#5887DA;--fk-tint:#EEF1FA;--fk-line:#E7EBF9;--fk-ink:#101820;--fk-gray:#898A8D;margin:24px auto;padding:0 16px}
+.fk-faq__head{text-align:center;margin-bottom:32px}
+.fk-faq h2.fk-t{font-size:clamp(22px,2.4vw,30px);font-weight:700;color:var(--fk-ink);margin:0 0 10px;line-height:1.2}
+.fk-faq__head p{font-size:15px;line-height:1.5;color:var(--fk-gray);margin:0}
+.fk-faq h3{margin:0;font-size:16px;font-weight:600;color:var(--fk-ink);line-height:1.4}
+.fk-faq__grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;align-items:start}
+.fk-faq__col{display:flex;flex-direction:column;gap:14px}
+.fk-faq__item{background:#fff;border:1px solid var(--fk-line);border-radius:16px;transition:box-shadow .2s,border-color .2s}
+.fk-faq__item:hover,.fk-faq__item.is-open{border-color:#DCE3F5;box-shadow:0 4px 20px rgba(88,135,218,.08)}
+.fk-faq__q{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:16px;width:100%;padding:16px 20px;cursor:pointer;text-align:left}
+.fk-faq__q::before{content:"?";flex:0 0 40px;height:40px;border-radius:50%;background:var(--fk-tint);color:var(--fk-blue);display:grid;place-items:center;font-weight:700;font-size:18px;line-height:1}
+.fk-faq__q:focus-visible{outline:2px solid var(--fk-blue);outline-offset:2px;border-radius:16px}
+.fk-faq__qt{flex:1}
+.fk-faq__tg{position:relative;flex:0 0 18px;height:18px}
+.fk-faq__tg::before,.fk-faq__tg::after{content:"";position:absolute;left:0;top:50%;width:100%;height:2px;margin-top:-1px;background:var(--fk-blue);border-radius:2px;transition:transform .25s ease}
+.fk-faq__tg::after{transform:rotate(90deg)}
+.fk-faq__item.is-open .fk-faq__tg::after{transform:rotate(90deg) scaleX(0)}
+.fk-faq__a{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .3s ease,visibility 0s .3s}
+.fk-faq__item.is-open .fk-faq__a{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .3s ease}
+.fk-faq__ai{overflow:hidden;min-height:0}
+.fk-faq__ab{padding:2px 24px 20px 30px;color:var(--fk-gray);font-size:15px;line-height:1.7}
+.fk-faq__ab p{margin:0 0 8px}
+.fk-faq__ab ul{margin:0 0 8px;padding-left:20px}
+.fk-faq__ab>:last-child{margin-bottom:0}
+.fk-faq__ab a{color:var(--fk-blue)}
+.pv-empty{padding:60px 24px;text-align:center;color:#898A8D}
+
+dialog{border:1px solid var(--line);border-radius:16px;padding:0;width:min(720px,calc(100% - 32px));background:var(--panel);color:var(--ink)}
+dialog::backdrop{background:rgba(16,24,32,.45)}
+.dlg{padding:22px}
+.dlg h2{margin:0 0 6px;font-size:17px}
+.dlg p{margin:0 0 14px;color:var(--gray);font-size:13.5px}
+.dlg textarea{width:100%;min-height:260px;border:1px solid var(--line);border-radius:10px;padding:12px;font-family:var(--mono);font-size:12.5px;background:var(--tint2);resize:vertical}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.dlg-err{color:#C43D3D;font-size:13px;margin-top:8px;min-height:1em}
+
+@media (max-width:1100px){
+  .layout{grid-template-columns:1fr}
+  .out{position:static}
+  .pane-scroll,.code{max-height:none}
+}
+@media (max-width:640px){
+  .top{flex-direction:column;align-items:flex-start;padding:16px}
+  .layout{padding:16px;gap:20px}
+  .fk-faq__grid{grid-template-columns:1fr}
+  .warns{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>SSS HTML oluşturucu</h1>
+    <p>Soruları yaz, çıktıyı kopyalayıp T-Soft Ek Bilgi 4 alanına Kaynak modunda yapıştır.</p>
+  </div>
+  <div class="top-actions">
+    <button class="btn" id="btnImport" type="button">Mevcut HTML'i içe aktar</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">Formu temizle</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="form" aria-label="İçerik">
+    <div class="block">
+      <h2>Bölüm başlığı</h2>
+      <div class="field">
+        <label for="fTitle">Başlık</label>
+        <input id="fTitle" type="text" placeholder="Sıkça Sorulan Sorular">
+      </div>
+      <div class="field">
+        <label for="fDesc">Açıklama</label>
+        <input id="fDesc" type="text" placeholder="Ürün hakkında en çok merak edilen soruların yanıtları.">
+      </div>
+      <div class="field">
+        <label for="fProduct">Ürün adı (çıktıya girmez, sadece kontrol için)</label>
+        <input id="fProduct" type="text" placeholder="Vion Flex">
+        <p class="hint">Sorularda ürün adı geçmiyorsa uyarı gösterilir. AI cevabı alıntılarken soruyu ürünle eşleştirebilsin diye.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="qs-head">
+        <h2>Sorular</h2>
+        <span class="count" id="qCount"></span>
+      </div>
+      <p class="hint">Cevapta boş satır yeni paragraf açar. <code>- </code> ile başlayan satırlar liste olur. <code>**kalın**</code> ve <code>[metin](https://…)</code> desteklenir.</p>
+      <div class="qlist" id="qList"></div>
+      <button class="add" id="btnAdd" type="button">+ Soru ekle</button>
+    </div>
+  </section>
+
+  <section class="out" aria-label="Çıktı">
+    <div class="out-bar">
+      <div class="seg" role="group" aria-label="Görünüm">
+        <button type="button" data-tab="preview" aria-pressed="true">Önizleme</button>
+        <button type="button" data-tab="code" aria-pressed="false">HTML çıktısı</button>
+      </div>
+      <div class="fmt">
+        <span>Format</span>
+        <div class="seg" role="group" aria-label="Çıktı formatı">
+          <button type="button" data-fmt="micro" aria-pressed="true" title="Schema.org microdata ile. AI botları JS çalıştırmadan da soru-cevap yapısını görür.">Microdata</button>
+          <button type="button" data-fmt="plain" aria-pressed="false" title="Sadece h2/h3/p. Editör itemprop'ları siliyorsa bunu kullan.">Sade</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="panePreview">
+      <div class="pane-scroll"><div class="pv" id="preview"></div></div>
+    </div>
+
+    <div class="pane" id="paneCode" hidden>
+      <div class="code-wrap"><pre class="code" id="code"></pre></div>
+      <div class="code-foot">
+        <span class="status" id="status"></span>
+        <button class="btn btn-primary" id="btnCopy" type="button">HTML'i kopyala</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="dlgImport">
+  <div class="dlg">
+    <h2>Mevcut HTML'i içe aktar</h2>
+    <p>Ek Bilgi 4 alanındaki HTML'i buraya yapıştır. Form bu içerikle doldurulur, düzenleyip yeniden çıktı alabilirsin.</p>
+    <textarea id="impText" spellcheck="false" placeholder="<div itemscope itemtype=&quot;https://schema.org/FAQPage&quot;>…"></textarea>
+    <div class="dlg-err" id="impErr"></div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" type="button" id="impCancel">Vazgeç</button>
+      <button class="btn btn-primary" type="button" id="impOk">İçe aktar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  var KEY = 'fkFaqGen:v2';
+  var ICON = {
+    up:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4-4 4 4"/></svg>',
+    down:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>',
+    del:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M5 4.5l.6 8.5h4.8l.6-8.5"/></svg>'
+  };
+
+  var DEFAULT = { title:'', desc:'', product:'', fmt:'micro', items:[{q:'',a:''}] };
+
+  var state;
+  try { state = JSON.parse(localStorage.getItem(KEY)); } catch(e) { state = null; }
+  if (!state || !Array.isArray(state.items)) state = JSON.parse(JSON.stringify(DEFAULT));
+
+  var $ = function(id){ return document.getElementById(id); };
+  var fTitle=$('fTitle'), fDesc=$('fDesc'), fProduct=$('fProduct'), qList=$('qList');
+
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+  /* ---------- Metin -> HTML ---------- */
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function inline(s){
+    s = esc(s);
+    s = s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    s = s.replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\s)]+)\)/g,'<a href="$2">$1</a>');
+    return s;
+  }
+  function answerHtml(text){
+    var out=[];
+    String(text).replace(/\r/g,'').split(/\n\s*\n/).forEach(function(block){
+      var lines=block.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      var para=[], list=[];
+      function flushP(){ if(para.length){ out.push('<p>'+para.map(inline).join('<br>')+'</p>'); para=[]; } }
+      function flushL(){ if(list.length){ out.push('<ul>'+list.map(function(l){return '<li>'+inline(l)+'</li>';}).join('')+'</ul>'); list=[]; } }
+      lines.forEach(function(l){
+        var m=l.match(/^[-•*]\s+(.*)$/);
+        if(m){ flushP(); list.push(m[1]); } else { flushL(); para.push(l); }
+      });
+      flushP(); flushL();
+    });
+    return out;
+  }
+
+  function validItems(){
+    return state.items.filter(function(it){ return it.q.trim() && it.a.trim(); });
+  }
+
+  function buildOutput(){
+    var items=validItems(), micro=state.fmt==='micro', L=[];
+    if(micro) L.push('<div itemscope itemtype="https://schema.org/FAQPage">');
+    if(state.title.trim()) L.push('<h2>'+esc(state.title.trim())+'</h2>');
+    if(state.desc.trim()) L.push('<p>'+esc(state.desc.trim())+'</p>');
+    items.forEach(function(it){
+      L.push('');
+      var ans=answerHtml(it.a).join('\n');
+      if(micro){
+        L.push('<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">');
+        L.push('<h3 itemprop="name">'+esc(it.q.trim())+'</h3>');
+        L.push('<div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><div itemprop="text">');
+        L.push(ans);
+        L.push('</div></div>');
+        L.push('</div>');
+      } else {
+        L.push('<h3>'+esc(it.q.trim())+'</h3>');
+        L.push(ans);
+      }
+    });
+    if(micro) L.push('</div>');
+    return L.join('\n');
+  }
+
+  /* ---------- Uyarılar ---------- */
+  function norm(s){ return s.toLocaleLowerCase('tr-TR'); }
+  function warnings(it){
+    var w=[], q=it.q.trim(), a=it.a.trim(), p=state.product.trim();
+    if(!q && !a) return w;
+    if(!q) w.push('Soru boş, bu madde çıktıya girmeyecek.');
+    if(!a) { w.push('Cevap boş, bu madde çıktıya girmeyecek.'); return w; }
+    if(p && q && norm(q).indexOf(norm(p))===-1) w.push('Soruda ürün adı ("'+p+'") geçmiyor.');
+    if(/yukarıda|aşağıda|teknik özellik|inceleyebilirsiniz|sayfamız/i.test(a)) w.push('Cevap sayfanın başka bir yerine yönlendiriyor. Bilgiyi doğrudan yaz ki tek başına alıntılanabilsin.');
+    if(/\?\s*$/.test(q) && /(mi|mı|mu|mü)\?$/i.test(q) && !/^(evet|hayır)/i.test(a)) w.push('Evet/hayır sorusu: cevaba "Evet," ya da "Hayır," ile başla.');
+    if(/(süre|saat|dakika|kaç|ne kadar|kapasite|ağırlık|garanti)/i.test(q) && !/\d/.test(a)) w.push('Soru sayısal bir bilgi soruyor ama cevapta rakam yok.');
+    if(a.length>600) w.push('Cevap uzun ('+a.length+' karakter). İlk cümleyi net cevap yapıp kısaltmayı düşün.');
+    return w;
+  }
+
+  /* ---------- Form ---------- */
+  function renderList(){
+    qList.innerHTML='';
+    state.items.forEach(function(it,i){
+      var box=document.createElement('div'); box.className='q';
+      box.innerHTML=
+        '<div class="q-top">'+
+          '<span class="q-num" aria-hidden="true">'+(i+1)+'</span>'+
+          '<div class="q-fields">'+
+            '<input type="text" aria-label="Soru '+(i+1)+'" placeholder="Soru" data-k="q">'+
+            '<textarea aria-label="Cevap '+(i+1)+'" placeholder="Cevap. İlk cümle doğrudan cevap olsun, rakam ve birimle." data-k="a"></textarea>'+
+          '</div>'+
+          '<div class="q-tools">'+
+            '<button type="button" class="icon-btn" data-act="up" aria-label="Yukarı taşı" '+(i===0?'disabled':'')+'>'+ICON.up+'</button>'+
+            '<button type="button" class="icon-btn" data-act="down" aria-label="Aşağı taşı" '+(i===state.items.length-1?'disabled':'')+'>'+ICON.down+'</button>'+
+            '<button type="button" class="icon-btn del" data-act="del" aria-label="Soruyu sil">'+ICON.del+'</button>'+
+          '</div>'+
+        '</div>'+
+        '<ul class="warns"></ul>';
+      box.querySelector('[data-k="q"]').value=it.q;
+      box.querySelector('[data-k="a"]').value=it.a;
+      box.dataset.i=i;
+      qList.appendChild(box);
+      renderWarns(box,it);
+    });
+  }
+  function renderWarns(box,it){
+    box.querySelector('.warns').innerHTML=warnings(it).map(function(w){ return '<li>'+esc(w)+'</li>'; }).join('');
+  }
+  function refreshAllWarns(){
+    Array.prototype.forEach.call(qList.children,function(box){ renderWarns(box,state.items[+box.dataset.i]); });
+  }
+
+  qList.addEventListener('input',function(e){
+    var k=e.target.dataset.k; if(!k) return;
+    var box=e.target.closest('.q'), it=state.items[+box.dataset.i];
+    it[k]=e.target.value; renderWarns(box,it); update();
+  });
+  qList.addEventListener('click',function(e){
+    var b=e.target.closest('[data-act]'); if(!b) return;
+    var i=+b.closest('.q').dataset.i, act=b.dataset.act, arr=state.items;
+    if(act==='del'){
+      if((arr[i].q.trim()||arr[i].a.trim()) && !confirm('Bu soru silinsin mi?')) return;
+      arr.splice(i,1);
+    }
+    if(act==='up' && i>0){ var t=arr[i-1]; arr[i-1]=arr[i]; arr[i]=t; }
+    if(act==='down' && i<arr.length-1){ var t2=arr[i+1]; arr[i+1]=arr[i]; arr[i]=t2; }
+    renderList(); update();
+  });
+  $('btnAdd').addEventListener('click',function(){
+    state.items.push({q:'',a:''}); renderList(); update();
+    var last=qList.lastElementChild; if(last){ last.querySelector('input').focus(); last.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+  });
+
+  [['fTitle','title'],['fDesc','desc'],['fProduct','product']].forEach(function(p){
+    $(p[0]).addEventListener('input',function(e){ state[p[1]]=e.target.value; if(p[1]==='product') refreshAllWarns(); update(); });
+  });
+
+  /* ---------- Önizleme ---------- */
+  function renderPreview(){
+    var items=validItems(), pv=$('preview');
+    if(!items.length){ pv.innerHTML='<div class="pv-empty">En az bir soruya cevap yazdığında önizleme burada görünür.</div>'; return; }
+    var half=Math.ceil(items.length/2), cols=['',''];
+    items.forEach(function(it,i){
+      cols[i<half?0:1]+=
+        '<div class="fk-faq__item'+(i===0?' is-open':'')+'">'+
+          '<h3><button type="button" class="fk-faq__q" aria-expanded="'+(i===0)+'"><span class="fk-faq__qt">'+esc(it.q.trim())+'</span><span class="fk-faq__tg" aria-hidden="true"></span></button></h3>'+
+          '<div class="fk-faq__a"><div class="fk-faq__ai"><div class="fk-faq__ab">'+answerHtml(it.a).join('')+'</div></div></div>'+
+        '</div>';
+    });
+    pv.innerHTML='<div class="fk-faq">'+
+      ((state.title.trim()||state.desc.trim())?'<div class="fk-faq__head">'+
+        (state.title.trim()?'<h2 class="fk-t">'+esc(state.title.trim())+'</h2>':'')+
+        (state.desc.trim()?'<p>'+esc(state.desc.trim())+'</p>':'')+'</div>':'')+
+      '<div class="fk-faq__grid"><div class="fk-faq__col">'+cols[0]+'</div><div class="fk-faq__col">'+cols[1]+'</div></div></div>';
+  }
+  $('preview').addEventListener('click',function(e){
+    var b=e.target.closest('.fk-faq__q'); if(!b) return;
+    var item=b.closest('.fk-faq__item'), open=!item.classList.contains('is-open');
+    item.classList.toggle('is-open',open); b.setAttribute('aria-expanded',open);
+    if(e.target.closest('a')) e.preventDefault();
+  });
+
+  /* ---------- Güncelle ---------- */
+  function update(){
+    var html=buildOutput(), n=validItems().length, total=state.items.length;
+    $('code').textContent=html;
+    $('qCount').textContent=total+' soru';
+    $('status').innerHTML='<b>'+n+'</b> / '+total+' soru çıktıda · '+html.length.toLocaleString('tr-TR')+' karakter';
+    renderPreview(); save();
+  }
+
+  /* ---------- Sekmeler / format ---------- */
+  document.querySelectorAll('[data-tab]').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('[data-tab]').forEach(function(x){ x.setAttribute('aria-pressed',x===b); });
+      $('panePreview').hidden=b.dataset.tab!=='preview';
+      $('paneCode').hidden=b.dataset.tab!=='code';
+    });
+  });
+  function setFmt(f){
+    state.fmt=f;
+    document.querySelectorAll('[data-fmt]').forEach(function(x){ x.setAttribute('aria-pressed',x.dataset.fmt===f); });
+    update();
+  }
+  document.querySelectorAll('[data-fmt]').forEach(function(b){ b.addEventListener('click',function(){ setFmt(b.dataset.fmt); }); });
+
+  /* ---------- Kopyala ---------- */
+  $('btnCopy').addEventListener('click',function(){
+    var text=buildOutput(), btn=this;
+    function done(){ btn.textContent='Kopyalandı'; btn.classList.add('copied'); setTimeout(function(){ btn.textContent="HTML'i kopyala"; btn.classList.remove('copied'); },1600); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done,fallback);
+    } else fallback();
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(e){ alert('Kopyalanamadı, metni elle seç.'); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* ---------- İçe aktar ---------- */
+  function nodeText(n){
+    var s='';
+    n.childNodes.forEach(function(c){
+      if(c.nodeType===3) s+=c.textContent.replace(/\s+/g,' ');
+      else if(c.nodeType===1){
+        var t=c.tagName;
+        if(t==='BR') s+='\n';
+        else if(t==='STRONG'||t==='B') s+='**'+nodeText(c).trim()+'**';
+        else if(t==='A') s+='['+nodeText(c).trim()+']('+(c.getAttribute('href')||'')+')';
+        else s+=nodeText(c);
+      }
+    });
+    return s;
+  }
+  function answerText(container){
+    var blocks=[];
+    (function walk(el){
+      Array.prototype.forEach.call(el.children,function(c){
+        var t=c.tagName;
+        if(t==='P') blocks.push(nodeText(c).split('\n').map(function(l){return l.trim();}).join('\n').trim());
+        else if(t==='UL'||t==='OL') blocks.push(Array.prototype.map.call(c.querySelectorAll('li'),function(li){ return '- '+nodeText(li).trim(); }).join('\n'));
+        else if(t==='DIV') walk(c);
+        else if(c.textContent.trim()) blocks.push(nodeText(c).trim());
+      });
+    })(container);
+    if(!blocks.length && container.textContent.trim()) blocks.push(container.textContent.trim());
+    return blocks.filter(Boolean).join('\n\n');
+  }
+  function importHtml(html){
+    var doc=new DOMParser().parseFromString('<div id="r">'+html+'</div>','text/html'), root=doc.getElementById('r');
+    var h2=root.querySelector('h2'), items=[], desc='';
+    var blocks=root.querySelectorAll('[itemprop="mainEntity"]');
+    if(blocks.length){
+      blocks.forEach(function(b){
+        var q=b.querySelector('[itemprop="name"]'), a=b.querySelector('[itemprop="text"]')||b.querySelector('[itemprop="acceptedAnswer"]');
+        if(q) items.push({q:q.textContent.trim(),a:a?answerText(a):''});
+      });
+      var faq=root.querySelector('[itemtype*="FAQPage"]')||root;
+      var p=Array.prototype.find.call(faq.children,function(c){ return c.tagName==='P'; });
+      if(p) desc=p.textContent.trim();
+    } else {
+      var r=root; while(r.children.length===1 && r.firstElementChild.tagName==='DIV') r=r.firstElementChild;
+      var cur=null, tmp=null;
+      Array.prototype.forEach.call(r.children,function(c){
+        if(c.tagName==='H2') return;
+        if(c.tagName==='H3'){ if(cur) cur.a=answerText(tmp); tmp=document.createElement('div'); cur={q:c.textContent.trim(),a:''}; items.push(cur); return; }
+        if(cur) tmp.appendChild(c.cloneNode(true));
+        else if(!desc && c.tagName==='P') desc=c.textContent.trim();
+      });
+      if(cur) cur.a=answerText(tmp);
+    }
+    if(!items.length) return false;
+    state.title=h2?h2.textContent.trim():'';
+    state.desc=desc;
+    state.items=items;
+    state.fmt=blocks.length?'micro':'plain';
+    return true;
+  }
+  var dlg=$('dlgImport');
+  $('btnImport').addEventListener('click',function(){ $('impErr').textContent=''; $('impText').value=''; dlg.showModal(); $('impText').focus(); });
+  $('impCancel').addEventListener('click',function(){ dlg.close(); });
+  $('impOk').addEventListener('click',function(){
+    var v=$('impText').value.trim();
+    if(!v){ $('impErr').textContent='Önce HTML yapıştır.'; return; }
+    if(!importHtml(v)){ $('impErr').textContent='Soru bulunamadı. HTML\'de h3 başlıklar ya da itemprop="mainEntity" blokları olmalı.'; return; }
+    dlg.close(); fillForm();
+  });
+
+  $('btnReset').addEventListener('click',function(){
+    if(!confirm('Formdaki tüm içerik silinsin mi?')) return;
+    state={title:'',desc:'',product:'',fmt:state.fmt,items:[{q:'',a:''}]};
+    fillForm();
+  });
+
+  function fillForm(){
+    fTitle.value=state.title||''; fDesc.value=state.desc||''; fProduct.value=state.product||'';
+    renderList(); setFmt(state.fmt||'micro');
+  }
+  fillForm();
+})();
+</script>
+</body>
+</html>
